@@ -75,7 +75,6 @@ z-index: 2;
 position: relative;
 }
 
-/* Canvas dei fuochi d'artificio */
 #fireworksCanvas {
 position: absolute;
 top: 0;
@@ -84,6 +83,20 @@ width: 100%;
 height: 100%;
 z-index: 1;
 pointer-events: none;
+}
+
+/* Cuoricini */
+.heart {
+position: absolute;
+font-size: 25px;
+color: #ff4d6d;
+animation: floatUp 1.5s ease-out forwards;
+pointer-events: none;
+}
+
+@keyframes floatUp {
+0% { opacity: 1; transform: translateY(0) scale(1); }
+100% { opacity: 0; transform: translateY(-120px) scale(1.8); }
 }
 </style>
 </head>
@@ -94,7 +107,6 @@ pointer-events: none;
 <button id="yes">Sì</button>
 <button id="no">No</button>
 
-<!-- Sezione celebrazione -->
 <div id="celebration">
 <canvas id="fireworksCanvas"></canvas>
 <img id="celebrationGif" src="https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif" alt="Festa">
@@ -112,7 +124,7 @@ const ctx = fireworksCanvas.getContext("2d");
 
 let noClicks = 0;
 
-// Frasi sul pulsante No
+// Frasi del pulsante No
 const noMessages = [
 "Sei sicura? 😏",
 "Ancora sicura? 😉",
@@ -122,20 +134,66 @@ const noMessages = [
 "Ahah, prova ancora! 😎"
 ];
 
-// Funzione No: scappa più lontano
+// Frasi persuasive del pulsante Sì
+const yesMessages = [
+"Secondo me dovresti premere qui 😌",
+"Guarda che non è una cattiva idea 😳",
+"Più aspetti, più divento irresistibile 😎",
+"Non fare la timida 😁",
+"Prometto che non te ne pentirai 😌",
+"Dai, manca solo un clic 😄",
+"Sto diventando gigante per te 😅"
+];
+
+let yesIndex = 0;
+
+// Funzione cuoricini
+function spawnHeart() {
+const heart = document.createElement("div");
+heart.classList.add("heart");
+heart.innerText = "❤️";
+
+const x = yesBtn.offsetLeft + yesBtn.offsetWidth / 2;
+const y = yesBtn.offsetTop;
+
+heart.style.left = x + "px";
+heart.style.top = y + "px";
+
+document.body.appendChild(heart);
+
+setTimeout(() => heart.remove(), 1500);
+}
+
+// Funzione che ingrandisce il Sì e cambia frase
+function updateYesButton() {
+let currentSize = parseInt(window.getComputedStyle(yesBtn).fontSize);
+yesBtn.style.fontSize = (currentSize + 20) + "px";
+
+if (yesIndex < yesMessages.length) {
+yesBtn.innerText = yesMessages[yesIndex];
+yesIndex++;
+} else {
+yesBtn.innerText = "Ormai devi premere qui 😆";
+}
+
+yesBtn.style.transform = "scale(1.2)";
+setTimeout(() => yesBtn.style.transform = "scale(1)", 150);
+
+spawnHeart();
+}
+
+// Movimento del No
 noBtn.addEventListener("mouseover", () => {
-const speed = Math.min(400 + noClicks * 70, window.innerWidth / 2); // più lontano
+const speed = Math.min(400 + noClicks * 70, window.innerWidth / 2);
 const x = Math.random() * (window.innerWidth - speed);
 const y = Math.random() * (window.innerHeight - 50);
 noBtn.style.left = x + "px";
 noBtn.style.top = y + "px";
 
-let size = parseInt(window.getComputedStyle(noBtn).fontSize);
-size = Math.max(size - 1, 12);
-noBtn.style.fontSize = size + "px";
+updateYesButton();
 });
 
-// Clic su No: cambia testo + Sì cresce
+// Click sul No
 noBtn.addEventListener("click", () => {
 if (noClicks < noMessages.length) {
 noBtn.innerText = noMessages[noClicks];
@@ -144,18 +202,10 @@ noBtn.innerText = "Ok, ci ripenso… 😅";
 }
 noClicks++;
 
-let currentSize = parseInt(window.getComputedStyle(yesBtn).fontSize);
-yesBtn.style.fontSize = (currentSize + 55) + "px";
-
-const colors = ["#ff4d6d", "#ff3366", "#ff1a75", "#ff6699", "#ff85b3"];
-yesBtn.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-
-yesBtn.style.transform = "translateX(-5px)";
-setTimeout(() => yesBtn.style.transform = "translateX(5px)", 100);
-setTimeout(() => yesBtn.style.transform = "translateX(0)", 200);
+updateYesButton();
 });
 
-// Funzione fuochi d'artificio
+// Fuochi d'artificio
 function launchFireworks() {
 fireworksCanvas.width = window.innerWidth;
 fireworksCanvas.height = window.innerHeight;
@@ -194,7 +244,6 @@ if (p.life <= 0) particles.splice(i, 1);
 if (particles.length > 0) requestAnimationFrame(animate);
 }
 
-// Genera i fuochi
 for (let i = 0; i < 100; i++) {
 const x = Math.random() * fireworksCanvas.width;
 const y = Math.random() * fireworksCanvas.height / 2;
@@ -205,14 +254,14 @@ particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.lengt
 animate();
 }
 
-// Clic su Sì: mostra GIF + fuochi
+// Click sul Sì
 yesBtn.addEventListener("click", () => {
 yesBtn.style.display = "none";
 noBtn.style.display = "none";
 document.querySelector("h1").style.display = "none";
 
 celebration.style.display = "flex";
-celebrationGif.src = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzNrcTFxeHVmdndzZDR4d25zZ2JiaWdwa3VwbnBzcWh6NHM4anRyNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mRpYh11bLKZlm/giphy.gif"; // sostituisci con la tua GIF
+celebrationGif.src = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzNrcTFxeHVmdndzZDR4d25zZ2JiaWdwa3VwbnBzcWh6NHM4anRyNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mRpYh11bLKZlm/giphy.gif";
 
 launchFireworks();
 });
