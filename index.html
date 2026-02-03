@@ -59,8 +59,8 @@ position: relative;
 }
 
 #celebration img {
-width: 300px;
-max-width: 80%;
+width: 60vw;
+max-width: 900px;
 height: auto;
 margin-bottom: 20px;
 z-index: 2;
@@ -124,7 +124,7 @@ const ctx = fireworksCanvas.getContext("2d");
 
 let noClicks = 0;
 
-// Frasi del pulsante No
+// Frasi del pulsante No (click)
 const noMessages = [
 "Sei sicura? 😏",
 "Ancora sicura? 😉",
@@ -133,6 +133,18 @@ const noMessages = [
 "Ma… non vuoi proprio? 😭",
 "Ahah, prova ancora! 😎"
 ];
+
+// Frasi del No mentre scappa
+const noRunMessages = [
+"Ehi! Troppo vicino 😳",
+"Ops, quasi! 😅",
+"Non mi prendi così facilmente 😎",
+"Ahah, devi essere più veloce 😂",
+"Sto scappando viaaa 😆",
+"Non rinunciare, riprova 😁"
+];
+
+let noRunIndex = 0;
 
 // Frasi persuasive del pulsante Sì
 const yesMessages = [
@@ -147,7 +159,7 @@ const yesMessages = [
 
 let yesIndex = 0;
 
-// Funzione cuoricini
+// Cuoricini
 function spawnHeart() {
 const heart = document.createElement("div");
 heart.classList.add("heart");
@@ -164,7 +176,7 @@ document.body.appendChild(heart);
 setTimeout(() => heart.remove(), 1500);
 }
 
-// Funzione che ingrandisce il Sì e cambia frase
+// Crescita e frasi del Sì
 function updateYesButton() {
 let currentSize = parseInt(window.getComputedStyle(yesBtn).fontSize);
 yesBtn.style.fontSize = (currentSize + 20) + "px";
@@ -189,6 +201,14 @@ const x = Math.random() * (window.innerWidth - speed);
 const y = Math.random() * (window.innerHeight - 50);
 noBtn.style.left = x + "px";
 noBtn.style.top = y + "px";
+
+// Frasi mentre scappa
+if (noRunIndex < noRunMessages.length) {
+noBtn.innerText = noRunMessages[noRunIndex];
+noRunIndex++;
+} else {
+noBtn.innerText = "Sto ancora scappando 😆";
+}
 
 updateYesButton();
 });
